@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resultados de “{{ consulta }}”{% endblock %}
+
+{% block content %}
+<div class="container px-4">
+  <h2 class="mt-4 mb-3">Resultados para “{{ consulta }}”</h2>
+
+
+  <form method="GET" action="{% url 'peliculas:buscar_pelicula' %}" class="d-flex position-relative" style="max-width:400px;">
+  <input type="text"
+         id="search-input"
+         name="q"
+         value="{{ request.GET.q|default:'' }}"
+         class="form-control custom-search me-2"
+         placeholder="🔍 Buscar películas o series…"
+         autocomplete="off">
+  <button class="btn btn-danger px-4">Buscar</button>
+
+
+  <div id="suggestions" class="suggestions d-none"></div>
+</form>
+
+  {% if resultados_tmdb %}
+    <div class="row g-4 justify-content-center">
+      {% for r in resultados_tmdb %}
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 text-center">
+          <a href="{% url 'peliculas:detalle_pelicula_tmdb' r.tipo r.id %}">
+            {% if r.poster_url %}
+              <img src="{{ r.poster_url }}"
+                   alt="{{ r.titulo }}"
+                   class="poster-hover rounded img-fluid mb-2"
+                   style="max-height:300px; width:auto;">
+            {% else %}
+              <div style="max-height:300px; width:auto; background:#333;" class="rounded mb-2"></div>
+            {% endif %}
+          </a>
+          <p class="h6 fw-bold mb-1">
+            <a href="{% url 'peliculas:detalle_pelicula_tmdb' r.tipo r.id %}"
+               class="text-white text-decoration-none">
+              {{ r.titulo }}
+            </a>
+          </p>
+          {% if r.fecha %}
+            <p class="text-muted small">
+              {{ r.fecha|date:"j \\d\\e F \\d\\e Y" }}
+            </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No se encontraron resultados para “{{ consulta }}”.</p>
+  {% endif %}
+</div>
+{% endblock %}

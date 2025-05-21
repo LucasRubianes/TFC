@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CineBD – Inicio{% endblock %}
+
+{% block content %}
+<main class="container py-5 flex-fill home-main">
+
+
+  {# 1) TENDENCIAS SEMANALES #}
+  <section class="mb-5">
+    <h2 class="section-title">Tendencias de la semana</h2>
+    <div class="slider-wrapper">
+      <button class="slider-nav prev" aria-label="Anterior">‹</button>
+      <div class="slider">
+        {% for peli in tendencias %}
+          <div class="slider-item">
+            <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}">
+              <img src="{{ peli.poster_url }}" alt="{{ peli.titulo }}" class="poster-rect">
+            </a>
+              <p class="slider-caption">{{ peli.titulo }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <button class="slider-nav next" aria-label="Siguiente">›</button>
+    </div>
+  </section>
+
+  {# 2) COLECCIONES ESPECIALES #}
+  {% for nombre, slug, lista in colecciones %}
+  <section class="mb-5">
+    <h2 class="section-title">{{ nombre }}</h2>
+    <div class="slider-wrapper">
+      <button class="slider-nav prev" aria-label="Anterior">‹</button>
+      <div class="slider">
+        {% for peli in lista %}
+          <div class="slider-item">
+            <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}">
+              <img src="{{ peli.poster_url }}" alt="{{ peli.titulo }}" class="poster-rect">
+            </a>
+              <p class="slider-caption">{{ peli.titulo }}</p>
+
+          </div>
+        {% endfor %}
+        <div class="slider-item">
+          <a href="{% url 'peliculas:coleccion' slug %}"
+             class="d-flex align-items-center justify-content-center poster-rect text-decoration-none">
+            <strong>Ver más</strong>
+          </a>
+        </div>
+      </div>
+      <button class="slider-nav next" aria-label="Siguiente">›</button>
+    </div>
+  </section>
+  {% endfor %}
+
+  {# 3) FILAS POR GÉNERO #}
+  {% for nombre, slug, lista in secciones %}
+  <section class="mb-5">
+    <h2 class="section-title">{{ nombre }}</h2>
+    <div class="slider-wrapper">
+      <button class="slider-nav prev" aria-label="Anterior">‹</button>
+      <div class="slider">
+        {% for peli in lista %}
+          <div class="slider-item">
+            <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}">
+              <img src="{{ peli.poster_url }}" alt="{{ peli.titulo }}" class="poster-rect">
+            </a>
+               <p class="slider-caption">{{ peli.titulo }}</p>
+          </div>
+        {% endfor %}
+        <div class="slider-item">
+          <a href="{% url 'peliculas:genero' slug %}"
+             class="d-flex align-items-center justify-content-center poster-rect text-decoration-none">
+            <strong>Ver más</strong>
+          </a>
+        </div>
+      </div>
+      <button class="slider-nav next" aria-label="Siguiente">›</button>
+    </div>
+  </section>
+  {% endfor %}
+
+</main>
+
+{# Pequeño JS para los botones prev/next #}
+<script>
+  document.querySelectorAll('.slider-wrapper').forEach(wrapper => {
+    const slider = wrapper.querySelector('.slider');
+    wrapper.querySelector('.slider-nav.prev').addEventListener('click', () => {
+      slider.scrollBy({ left: - (slider.offsetWidth * 0.8), behavior: 'smooth' });
+    });
+    wrapper.querySelector('.slider-nav.next').addEventListener('click', () => {
+      slider.scrollBy({ left:   (slider.offsetWidth * 0.8), behavior: 'smooth' });
+    });
+  });
+</script>
+{% endblock %}

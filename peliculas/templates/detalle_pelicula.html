@@ -1,0 +1,194 @@
+{# peliculas/templates/detalle_pelicula.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body_class %}detail-page{% endblock %}
+
+{% block title %}{{ detalles.titulo }} – CineBD{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+  <!-- ——— TRÁILER ——— -->
+  {% if videos %}
+    <section class="mb-5">
+      <h2 class="h4 section-title">Tráiler oficial</h2>
+      <div class="ratio ratio-16x9">
+        <iframe
+          src="https://www.youtube.com/embed/{{ videos.0.key }}?rel=0"
+          title="{{ detalles.titulo }} - Tráiler"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- ——— IMÁGENES DESTACADAS ——— -->
+  {% if backdrops %}
+    <section class="mb-5">
+      <h2 class="h4 section-title">Imágenes destacadas</h2>
+      <div class="row g-2">
+        {% for path in backdrops %}
+          <div class="col-6 col-md-3">
+            <img
+              src="https://image.tmdb.org/t/p/w780{{ path }}"
+              class="img-fluid rounded"
+              alt="Imagen de {{ detalles.titulo }}">
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- ——— DETALLE PRINCIPAL ——— -->
+  <div class="row g-4">
+    <!-- Póster + Estrellas -->
+    <div class="col-md-4 text-center">
+      {% if detalles.poster_url %}
+        <img src="{{ detalles.poster_url }}"
+             class="img-fluid rounded mb-3"
+             alt="{{ detalles.titulo }}">
+      {% else %}
+        <div class="text-muted">Sin póster.</div>
+      {% endif %}
+
+      <div id="star-rating"
+           data-url="{% url 'peliculas:rate_movie' tmdb_id %}"
+           data-initial="{{ user_rating }}">
+        {% for i in star_range %}
+          <span class="star{% if user_rating >= i %} filled{% endif %}"
+                data-score="{{ i }}">★</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Texto, géneros, director y reparto -->
+    <div class="col-md-8">
+      <h1 class="mb-2">{{ detalles.titulo }}</h1>
+      <p>{{ detalles.descripcion }}</p>
+
+      <ul class="list-unstyled">
+        {% if detalles.fecha_estreno %}
+          <li><strong>Estreno:</strong> {{ detalles.fecha_estreno }}</li>
+        {% endif %}
+        {% if generos %}
+          <li><strong>Géneros:</strong> {{ generos|join:", " }}</li>
+        {% endif %}
+        {% if detalles.rating %}
+          <li>
+            <strong>Nota:</strong> {{ detalles.rating }} / 10
+            {% if detalles.votos %} ({{ detalles.votos }} votos){% endif %}
+          </li>
+        {% endif %}
+      </ul>
+
+      <!-- Director -->
+      <div class="mt-5">
+        <h2 class="h4">Director</h2>
+        {% if director %}
+          <div class="row">
+            <div class="col-4 col-sm-3 col-md-4 col-lg-3 mb-3">
+              <div class="card h-100 text-center bg-dark text-white">
+                {% if director.foto %}
+                  <img src="{{ director.foto }}"
+                       class="card-img-top rounded-circle mx-auto mt-3"
+                       style="width:80px; height:80px; object-fit:cover;"
+                       alt="{{ director.nombre }}">
+                {% endif %}
+                <div class="card-body p-2">
+                  <a href="{% url 'peliculas:detalle_persona' director.id %}"
+                     class="stretched-link text-white text-decoration-none">
+                    <small>{{ director.nombre }}</small>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <p class="text-muted">No disponible.</p>
+        {% endif %}
+      </div>
+
+      <!-- Reparto principal -->
+      <div class="mt-4">
+        <h2 class="h4">Reparto principal</h2>
+        {% if actores %}
+          <div class="row">
+            {% for a in actores %}
+              <div class="col-4 col-sm-3 col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 text-center bg-dark text-white">
+                  {% if a.foto %}
+                    <img src="{{ a.foto }}"
+                         class="card-img-top rounded-circle mx-auto mt-3"
+                         style="width:80px; height:80px; object-fit:cover;"
+                         alt="{{ a.nombre }}">
+                  {% endif %}
+                  <div class="card-body p-2">
+                    <a href="{% url 'peliculas:detalle_persona' a.id %}"
+                       class="stretched-link text-white text-decoration-none">
+                      <small>{{ a.nombre }}</small>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted">No disponible.</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container     = document.getElementById('star-rating');
+  if (!container) return;
+
+  const url           = container.dataset.url;
+  let   currentRating = parseInt(container.dataset.initial, 10) || 0;
+  const stars         = Array.from(container.querySelectorAll('.star'));
+
+  function paintStars(score) {
+    stars.forEach(star => {
+      const s = parseInt(star.dataset.score, 10);
+      star.classList.toggle('filled', s <= score);
+    });
+  }
+
+  paintStars(currentRating);
+
+  stars.forEach(star => {
+    const score = parseInt(star.dataset.score, 10);
+
+    star.addEventListener('mouseover', () => paintStars(score));
+    star.addEventListener('mouseout',  () => paintStars(currentRating));
+
+    star.addEventListener('click', () => {
+      fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `score=${score}`
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Error al guardar valoración');
+        return res.json();
+      })
+      .then(json => {
+        currentRating = json.score;
+        paintStars(currentRating);
+      })
+      .catch(console.error);
+    });
+  });
+});
+</script>
+{% endblock %}

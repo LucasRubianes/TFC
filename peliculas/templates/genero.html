@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Películas de {{ nombre }} – CineBD{% endblock %}
+
+{% block content %}
+<div class="container px-4">
+  <h2 class="mt-4 mb-3">{{ nombre }}</h2>
+
+  {% if page_obj %}
+    <div class="row g-4 justify-content-center">
+      {% for peli in page_obj %}
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 text-center">
+          <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}">
+            {% if peli.poster_url %}
+              <img src="{{ peli.poster_url }}"
+                   alt="{{ peli.titulo }}"
+                   class="poster-hover rounded img-fluid mb-2"
+                   style="max-height:300px; width:auto;">
+            {% else %}
+              <div class="rounded mb-2"
+                   style="max-height:300px; width:auto; background:#333;"></div>
+            {% endif %}
+          </a>
+          <p class="h6 fw-bold mb-1">
+            <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}"
+               class="text-white text-decoration-none">
+              {{ peli.titulo }}
+            </a>
+          </p>
+          {% if peli.fecha %}
+            <p class="text-muted small">
+              {{ peli.fecha|date:"j \\d\\e F \\d\\e Y" }}
+            </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {# Controles de paginación BONITOS #}
+    <nav class="mt-5">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link btn btn-dark rounded-pill px-4 me-2 shadow-sm"
+               href="?page={{ page_obj.previous_page_number }}">
+              ‹ Anterior
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link btn btn-secondary rounded-pill px-4 me-2">‹ Anterior</span>
+          </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+          <span class="page-link bg-dark text-white border-0 rounded-pill px-3">
+            Página {{ page_obj.number }} de {{ paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link btn btn-dark rounded-pill px-4 ms-2 shadow-sm"
+               href="?page={{ page_obj.next_page_number }}">
+              Siguiente ›
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link btn btn-secondary rounded-pill px-4 ms-2">Siguiente ›</span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+
+  {% else %}
+    <p class="text-muted">No hay películas en este género.</p>
+  {% endif %}
+</div>
+{% endblock %}

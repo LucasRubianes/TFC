@@ -1,0 +1,25 @@
+body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+.poster-hover {
+  transition: transform 0.3s ease;
+}
+
+.poster-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Géneros */
+#menu-generos {
+  display: none;
+  margin: 20px auto;
+  text-align: center;
+}
+
+#menu-generos ul {
+  list-style: none;
+  padding: 0;
+}
+
+#menu-generos li {
+  display: inline-block;
+  margin: 0 10px;
+}

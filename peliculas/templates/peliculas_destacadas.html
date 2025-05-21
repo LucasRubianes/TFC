@@ -1,0 +1,27 @@
+<div class="row g-4 justify-content-center">
+  {% for peli in peliculas %}
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 text-center">
+      <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}">
+        {% if peli.poster_url %}
+          <img src="{{ peli.poster_url }}"
+               alt="{{ peli.titulo }}"
+               class="poster-hover rounded img-fluid mb-2"
+               style="max-height:300px; width:auto;">
+        {% else %}
+          <div style="max-height:300px; width:auto; background:#333;" class="rounded mb-2"></div>
+        {% endif %}
+      </a>
+      <p class="h6 fw-bold mb-1">
+        <a href="{% url 'peliculas:detalle_pelicula_tmdb' peli.tipo peli.id %}"
+           class="text-white text-decoration-none">
+          {{ peli.titulo }}
+        </a>
+      </p>
+      {% if peli.fecha %}
+        <p class="text-muted small">
+          {{ peli.fecha|date:"j \\d\\e F \\d\\e Y" }}
+        </p>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

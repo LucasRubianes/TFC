@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ persona.nombre }} | CineBD{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row align-items-start">
+    <!-- FOTO Y DATOS -->
+    <div class="col-md-4 mb-4">
+      <div class="card bg-dark text-white border-0 shadow">
+        {% if persona.foto %}
+          <img src="{{ persona.foto }}"
+               alt="{{ persona.nombre }}"
+               class="persona-photo">
+        {% else %}
+          <img src="{% static 'peliculas/img/default_profile.png' %}"
+               alt="Avatar genérico"
+               class="persona-photo">
+        {% endif %}
+        <div class="card-body text-center">
+          <h3 class="card-title">{{ persona.nombre }}</h3>
+          {% if persona.cumpleanos %}
+            <p class="mb-1">🎂 {{ persona.cumpleanos|date:"j \\d\\e F \\d\\e Y" }}</p>
+          {% endif %}
+          {% if persona.lugar_nacimiento %}
+            <p>📍 {{ persona.lugar_nacimiento }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- BIOGRAFÍA -->
+    <div class="col-md-8 mb-4">
+      <h4 class="text-white mb-3">Biografía</h4>
+      <p style="white-space: pre-line;">{{ persona.biografia }}</p>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+  <!-- PELÍCULAS DIRIGIDAS -->
+  {% if mostrar_dirigidas %}
+    <h3 class="mb-4">Películas dirigidas</h3>
+    <div class="row">
+      {% for d in persona.peliculas_dirigidas|slice:":20" %}
+        <div class="col-6 col-sm-4 col-md-3 mb-4 text-center">
+          <a href="{% url 'peliculas:detalle_pelicula_tmdb' d.tipo d.id %}"
+             class="text-decoration-none">
+            {% if d.poster_url %}
+              <img src="{{ d.poster_url }}"
+                   alt="{{ d.titulo }}"
+                   class="poster-hover poster-rect-sm d-block mx-auto mb-2">
+            {% else %}
+              <div class="poster-rect-sm bg-secondary d-block mx-auto mb-2"></div>
+            {% endif %}
+            <div class="small text-white">{{ d.titulo }}</div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- ACTUACIONES DESTACADAS -->
+  {% if mostrar_actuaciones %}
+    <h3 class="mb-4">Actuaciones destacadas</h3>
+    <div class="row">
+      {% for a in persona.actuaciones|slice:":20" %}
+        <div class="col-6 col-sm-4 col-md-3 mb-4 text-center">
+          <a href="{% url 'peliculas:detalle_pelicula_tmdb' a.tipo a.id %}"
+             class="text-decoration-none">
+            {% if a.poster_url %}
+              <img src="{{ a.poster_url }}"
+                   alt="{{ a.titulo }}"
+                   class="poster-hover poster-rect-sm d-block mx-auto mb-2">
+            {% else %}
+              <div class="poster-rect-sm bg-secondary d-block mx-auto mb-2"></div>
+            {% endif %}
+            <div class="small text-white">{{ a.titulo }}</div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
