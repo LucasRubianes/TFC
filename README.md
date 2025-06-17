@@ -144,4 +144,4 @@ Consulta el archivo LICENSE para más detalles.
 - **Django** por su framework web robusto y flexible  
 - **Todos los contribuidores** que hacen crecer este proyecto  
 
-⭐ Desarrollado con ❤️ por Lucas Rubianes Eiras ⭐
+Desarrollado por Lucas Rubianes Eiras
