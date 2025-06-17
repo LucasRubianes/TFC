@@ -138,10 +138,4 @@ Consulta el archivo LICENSE para más detalles.
 
 ---
 
-## 🙏 Agradecimientos
-
-- **The Movie Database (TMDB)** por su API abierta y completa  
-- **Django** por su framework web robusto y flexible  
-- **Todos los contribuidores** que hacen crecer este proyecto  
-
 Desarrollado por Lucas Rubianes Eiras
